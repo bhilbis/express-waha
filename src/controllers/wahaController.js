@@ -1,4 +1,5 @@
 const axios = require('axios');
+// const message = require('../models/Invitation');
 
 // const WAHA_API_BASE_URL = 'http://149.28.155.78:3000/api';
 const WAHA_API_BASE_URL = 'http://localhost:3001/api';
@@ -64,7 +65,16 @@ const sendMessage = async (req, res) => {
         const { chatId, text, session } = req.body;
         console.log(`Sending message to ${chatId}: ${text}`);
         const response = await axios.post(`${WAHA_API_BASE_URL}/sendText`, { chatId, text, session });
-        res.status(response.status).send(response.data);
+
+        // await message.create({
+        //     message:text,
+        //     date_sent: new Date(),
+        //     date_receive: new Date(),
+        //     status: 'sent',
+        //     receiver_number: chatId,
+        //     sender_number: 'your_number'
+        // });
+        // res.status(response.status).send(response.data);
 
         notifyClients({ chatId, text, session });
     } catch (error) {

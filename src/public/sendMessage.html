@@ -4,105 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Send Message</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        h1 {
-            font-size: 24px;
-            color: #333;
-            text-align: center;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-        label {
-            margin-bottom: 5px;
-            color: #555;
-        }
-        select, input, textarea, button {
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-        .response {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #555;
-            text-align: center;
-        }
-        .success {
-            color: green;
-        }
-        .error {
-            color: red;
-        }
-        .bold {
-            font-weight: bold;
-        }
-        .center {
-            text-align: center;
-        }
-    </style>
+    <link rel="stylesheet" href="message.css">
 </head>
 <body>
     <div class="container">
         <h1>Send Message</h1>
         <button type="button" onclick="history.back()">Back</button>
         <form id="sendMessageForm">
-            <label for="countryCode">Country Code:</label>
-            <select id="countryCode" name="countryCode">
-                <option value="62">Indonesia (+62)</option>
-                <option value="1">USA (+1)</option>
-                <option value="91">India (+91)</option>
-            </select>
-            <label for="chatId"><small>(Recipient)</small> Phone Number: <small>(<i>without your international phone number</i>)</small></label>
-            <input type="text" id="chatId" name="chatId" placeholder="859*********" required>
-            <label for="namaLakiLaki">Nama Laki-Laki:</label>
-            <input type="text" id="namaLakiLaki" name="namaLakiLaki" required>
-            <label for="namaPerempuan">Nama Perempuan:</label>
-            <input type="text" id="namaPerempuan" name="namaPerempuan" required>
-            <label for="hari">Hari:</label>
-            <input type="text" id="hari" name="hari" required>
-            <label for="tanggal">Tanggal:</label>
-            <input type="date" id="tanggal" name="tanggal" required>
-            <label for="waktuMulai">Waktu Mulai:</label>
-            <input type="time" id="waktuMulai" name="waktuMulai" required>
-            <label for="waktuSelesai">Waktu Selesai:</label>
-            <input type="time" id="waktuSelesai" name="waktuSelesai" required>
-            <label for="lokasi">Lokasi:</label>
-            <input type="text" id="lokasi" name="lokasi" required>
-            <button type="submit">Send Message</button>
+            <div class="step active" id="step1">
+                <label for="countryCode">Country Code:</label>
+                <select id="countryCode" name="countryCode">
+                    <option value="62">Indonesia (+62)</option>
+                    <option value="1">USA (+1)</option>
+                    <option value="91">India (+91)</option>
+                </select>
+                <label for="chatId"><small>(Recipient)</small> Phone Number: <small>(<i>without your international phone number</i>)</small></label>
+                <input type="text" id="chatId" name="chatId" placeholder="859*********" required>
+                <label for="namaLakiLaki">Nama Laki-Laki:</label>
+                <input type="text" id="namaLakiLaki" name="namaLakiLaki" required>
+                <label for="namaPerempuan">Nama Perempuan:</label>
+                <input type="text" id="namaPerempuan" name="namaPerempuan" required>
+                <button type="button" onclick="nextStep()">Next</button>
+            </div>
+            <div class="step" id="step2">
+                <h2>Akad</h2>
+                <label for="hariAkad">Hari:</label>
+                <input type="text" id="hariAkad" name="hariAkad" required>
+                <label for="tanggalAkad">Tanggal:</label>
+                <input type="date" id="tanggalAkad" name="tanggalAkad" required>
+                <label for="waktuMulaiAkad">Waktu Mulai:</label>
+                <input type="time" id="waktuMulaiAkad" name="waktuMulaiAkad" required>
+                <label for="waktuSelesaiAkad">Waktu Selesai:</label>
+                <input type="time" id="waktuSelesaiAkad" name="waktuSelesaiAkad" required>
+                <label for="lokasiAkad">Lokasi:</label>
+                <input type="text" id="lokasiAkad" name="lokasiAkad" required>
+                <button type="button" onclick="nextStep()">Next</button>
+            </div>
+            <div class="step" id="step3">
+                <h2>Resepsi</h2>
+                <label for="hariResepsi">Hari:</label>
+                <input type="text" id="hariResepsi" name="hariResepsi" required>
+                <label for="tanggalResepsi">Tanggal:</label>
+                <input type="date" id="tanggalResepsi" name="tanggalResepsi" required>
+                <label for="waktuMulaiResepsi">Waktu Mulai:</label>
+                <input type="time" id="waktuMulaiResepsi" name="waktuMulaiResepsi" required>
+                <label for="waktuSelesaiResepsi">Waktu Selesai:</label>
+                <input type="time" id="waktuSelesaiResepsi" name="waktuSelesaiResepsi" required>
+                <label for="lokasiResepsi">Lokasi:</label>
+                <input type="text" id="lokasiResepsi" name="lokasiResepsi" required>
+                <button type="submit">Send Message</button>
+            </div>
         </form>
+        <div class="center">
+            <button type="button" onclick="showStep(1)">1</button>
+            <button type="button" onclick="showStep(2)">2</button>
+            <button type="button" onclick="showStep(3)">3</button>
+        </div>
         <p id="response"></p>
     </div>
 
     <script>
+        let currentStep = 1;
+
+    function showStep(step) {
+        document.getElementById(`step${currentStep}`).classList.remove('active');
+        currentStep = step;
+        document.getElementById(`step${currentStep}`).classList.add('active');
+    }
+        
+        function nextStep() {
+            const activeStep = document.querySelector('.step.active');
+            showStep(currentStep + 1)
+            activeStep.classList.remove('active');
+            if (activeStep.nextElementSibling) {
+                activeStep.nextElementSibling.classList.add('active');
+            }
+        }
+
         document.getElementById('sendMessageForm').addEventListener('submit', async function(event) {
             event.preventDefault();
             const countryCode = document.getElementById('countryCode').value;
@@ -110,28 +88,37 @@
             const chatId = countryCode + chatIdInput.value + '@c.us';
             const namaLakiLaki = document.getElementById('namaLakiLaki').value;
             const namaPerempuan = document.getElementById('namaPerempuan').value;
-            const hari = document.getElementById('hari').value;
-            const tanggal = document.getElementById('tanggal').value;
-            const waktuMulai = document.getElementById('waktuMulai').value;
-            const waktuSelesai = document.getElementById('waktuSelesai').value;
-            const lokasi = document.getElementById('lokasi').value;
-            const textTambahan = document.getElementById('text').value;
+            const hariAkad = document.getElementById('hariAkad').value;
+            const tanggalAkad = document.getElementById('tanggalAkad').value;
+            const waktuMulaiAkad = document.getElementById('waktuMulaiAkad').value;
+            const waktuSelesaiAkad = document.getElementById('waktuSelesaiAkad').value;
+            const lokasiAkad = document.getElementById('lokasiAkad').value;
+            const hariResepsi = document.getElementById('hariResepsi').value;
+            const tanggalResepsi = document.getElementById('tanggalResepsi').value;
+            const waktuMulaiResepsi = document.getElementById('waktuMulaiResepsi').value;
+            const waktuSelesaiResepsi = document.getElementById('waktuSelesaiResepsi').value;
+            const lokasiResepsi = document.getElementById('lokasiResepsi').value;
             const session = 'default';
 
             const text = `
-            Bersama dengan undangan ini, saya turut mengundang Bapak/Ibu/Saudara untuk hadir di acara pernikahan kami.
-            *${namaLakiLaki} & ${namaPerempuan}*
+Bersama dengan undangan ini, saya turut mengundang Bapak/Ibu/Saudara untuk hadir di acara pernikahan kami.
+*${namaLakiLaki} & ${namaPerempuan}*
 
-            Akad akan digelar pada:
-            *Hari dan Tanggal:* ${hari}, ${tanggal}
-            *Pukul:* ${waktuMulai} WIB s/d ${waktuSelesai} WIB
-            *Lokasi:* ${lokasi}
+Akad akan digelar pada:
+*Hari dan Tanggal:* *${hariAkad}*, ${tanggalAkad}
+*Pukul: ${waktuMulaiAkad} WIB s/d ${waktuSelesaiAkad} WIB*
+*Lokasi: ${lokasiAkad}*
 
-            Demikian undangan dari kami yang sedang berbahagia.
-            Kami berharap Bapak/Ibu/Saudara berkenan untuk hadir di acara kami ini.
+Resepsi akan digelar pada:
+*Hari dan Tanggal:* *${hariResepsi}*, ${tanggalResepsi}
+*Pukul: ${waktuMulaiResepsi} WIB s/d ${waktuSelesaiResepsi} WIB*
+*Lokasi: ${lokasiResepsi}*
 
-            Anda bisa konfirmasi kehadiran melalui Undangan atau klik tombol RSVP dibawah ini.
-            `;
+Demikian undangan dari kami yang sedang berbahagia.
+Kami berharap Bapak/Ibu/Saudara berkenan untuk hadir di acara kami ini. \n\n
+
+Anda bisa konfirmasi kehadiran melalui Undangan atau klik tombol RSVP dibawah ini.
+`;
 
             const responseElement = document.getElementById('response');
             responseElement.textContent = '';
