@@ -1,6 +1,7 @@
 const axios = require('axios');
-const Message = require('../models/Invitation')
 const WAHA_API_BASE_URL = 'http://localhost:3001/api';
+const { addMessage, deleteConfirmation } = require('../services/invitationService')
+const { getWeddingInvitation } = require('../services/weddingInvitationService')
 
 let clients = [];
 let messages = [];
@@ -31,25 +32,6 @@ const handleWebhook = async (req, res) => {
 
         console.log(timestamp)
 
-        // try {
-        //     await Message.create({
-        //         message: messageText,
-        //         date_sent: dateSent,
-        //         date_read: null,
-        //         date_receive: dateReceive,
-        //         status: status,
-        //         receiver_number: receiverNumber,
-        //         sender_number: senderNumber,
-        //     });
-        //     console.log('Message loggend successfully')
-        // } catch (error) {
-        //     if (error.name === 'sequelizeUniqueConstraintError') {
-        //         console.log('Duplicate entry detected, skipping insertion');
-        //     } else {
-        //         console.error('Error inserting message into the database:', error);
-        //     }
-        // }
-
         console.log(`Received message from ${sender}: ${messageText}`);
         console.log(`Checking if message text is 'hadir': ${messageText.toLowerCase() === 'hadir'}`);
         console.log(`Is the message from me? ${fromMe}`);
@@ -63,8 +45,14 @@ const handleWebhook = async (req, res) => {
         const validCommands = ['rsvp', 'hadir', 'tidak hadir', 'konfirmasi', 'reset', '1', '2', '3', '4'];
 
         if (messageText === 'rsvp' && !fromMe) {
+            try {
+                const invitation = await getWeddingInvitation(sender);
+                if (!invitation) {
+                    await sendMessageToRecipient(sender, "Anda tidak memiliki undangan yang valid.", session);
+                    return res.status(200).send('Webhook processed');
+            }
+
             if (userSessions[sender].confirmed) {
-                try {
                     let summaryMessage;
                     if (userSessions[sender].attendance === 'hadir') {
                         summaryMessage = `Anda sudah memiliki RSVP. Berikut adalah ringkasan RSVP Anda:\n\nKehadiran: Hadir\nJumlah Orang: ${userSessions[sender].numberOfAttendees}\nAkomodasi: ${userSessions[sender].accommodationChoice}`;
@@ -74,12 +62,7 @@ const handleWebhook = async (req, res) => {
                     await sendMessageToRecipient(sender, summaryMessage, session);
                     console.log(`Sent existing RSVP summary to ${sender}`);
                     return res.status(200).send('Webhook processed');
-                } catch (error) {
-                    console.error('Error sending RSVP summary:', error.message);
-                }
-                return res.status(200).send('Webhook processed');
             } else if (userSessions[sender].resetConfirm && !userSessions[sender].resetConfirmed) {
-                try {
                     let summaryMessage;
                     if (userSessions[sender].attendance === 'hadir') {
                         summaryMessage = `Berikut adalah ringkasan RSVP Anda sebelumnya:\n\nKehadiran: Hadir\nJumlah Orang: ${userSessions[sender].numberOfAttendees}\nAkomodasi: ${userSessions[sender].accommodationChoice}`;
@@ -89,12 +72,7 @@ const handleWebhook = async (req, res) => {
                     await sendMessageToRecipient(sender, summaryMessage, session);
                     console.log(`Sent previous RSVP summary to ${sender}`);
                     return res.status(200).send('Webhook processed');
-                } catch (error) {
-                    console.error('Error sending previous RSVP summary:', error.message);
-                }
-                return res.status(200).send('Webhook processed');
             } else {
-                try {
                     console.log(`Sending RSVP start message to ${sender}`);
                     const rsvpMessage =
                         `Bersama dengan undangan ini, saya turut mengundang Bapak/Ibu/Saudara untuk hadir di acara pernikahan kami.
@@ -114,14 +92,29 @@ Demikian undangan dari kami yang sedang berbahagia.
 Kami berharap Bapak/Ibu/Saudara berkenan untuk hadir di acara kami ini.
 
 Mohon melengkapi RSVP ini sebelum Tanggal [tanggal].\n\nBalas pesan ini dengan\n*Hadir*\n*Tidak Hadir*`;
-                    await sendMessageToRecipient(sender, rsvpMessage, session);
+
+                const formattedRsvpMessage = rsvpMessage
+                    .replace('$[namaLakiLaki]', invitation.nama_laki_laki)
+                    .replace('$[namaPerempuan]', invitation.nama_perempuan)
+                    .replace('$[hariAkad]', invitation.hari_akad)
+                    .replace('$[tanggalAkad]', invitation.tanggal_akad)
+                    .replace('$[waktuMulaiAkad]', invitation.waktu_mulai_akad)
+                    .replace('$[waktuSelesaiAkad]', invitation.waktu_selesai_akad)
+                    .replace('$[lokasiAkad]', invitation.lokasi_akad)
+                    .replace('$[hariResepsi]', invitation.hari_resepsi)
+                    .replace('$[tanggalResepsi]', invitation.tanggal_resepsi)
+                    .replace('$[waktuMulaiResepsi]', invitation.waktu_mulai_resepsi)
+                    .replace('$[waktuSelesaiResepsi]', invitation.waktu_selesai_resepsi)
+                    .replace('$[lokasiResepsi]', invitation.lokasi_resepsi);    
+
+                    await sendMessageToRecipient(sender, formattedRsvpMessage, session);
                     console.log(`Confirmation message sent to ${sender}`);
                     userSessions[sender].started = true;
                     userSessions[sender].step = 'attendance';
-                } catch (error) {
-                    console.error('Error sending RSVP message:', error.message);
                 }
-            }
+        } catch(error) {
+            console.error('Error processing RSVP messages:', error.message);
+        } return res.status(200).send('Webhook processed') 
         } else if (!userSessions[sender].started && validCommands.includes(messageText) && !fromMe) {
             try {
                 console.log(`Sending error message to ${sender} for not starting with RSVP`);
@@ -184,6 +177,16 @@ Mohon melengkapi RSVP ini sebelum Tanggal [tanggal].\n\nBalas pesan ini dengan\n
             try {
                 console.log(`Processing non-attendance confirmation from ${sender}`);
                 await sendMessageToRecipient(sender, "Terima kasih telah memberitahu kami. Kami menghargai respons Anda.", session);
+                let summaryMessage = `status RSVP anda tidak hadir.`;
+                await addMessage({
+                        message: summaryMessage,
+                        date_sent: dateSent,
+                        date_read: null,
+                        date_receive: dateReceive,
+                        status: 'non-attendance', 
+                        receiver_number: receiverNumber,
+                        sender_number: senderNumber,
+                })
                 userSessions[sender].attendance = 'tidak hadir';
                 userSessions[sender].confirmed = true;
                 userSessions[sender].step = null;
@@ -197,12 +200,12 @@ Mohon melengkapi RSVP ini sebelum Tanggal [tanggal].\n\nBalas pesan ini dengan\n
                     let finalMessage = `Terima kasih, RSVP Anda telah berhasil.\n\nKehadiran: Hadir\nJumlah Orang: ${userSessions[sender].numberOfAttendees}\nAkomodasi: ${userSessions[sender].accommodationChoice}\n\nKami berharap dapat bertemu Anda di acara kami.`;
                     await sendMessageToRecipient(sender, finalMessage, session);
 
-                    await Message.create({
+                    await addMessage({
                         message: finalMessage,
                         date_sent: dateSent,
                         date_read: null,
                         date_receive: dateReceive,
-                        status: status,
+                        status: 'attendance',
                         receiver_number: receiverNumber,
                         sender_number: senderNumber,
                     });
@@ -224,9 +227,10 @@ Mohon melengkapi RSVP ini sebelum Tanggal [tanggal].\n\nBalas pesan ini dengan\n
             if (userSessions[sender].resetConfirm) {
                 userSessions[sender] = { started: false, confirmed: false, id: Date.now() };
                 try {
+                    await deleteConfirmation(receiverNumber);
                     const resetCompleteMessage = 'RSVP Anda telah direset. Silakan mulai dengan mengetik "RSVP" untuk memulai ulang.';
                     await sendMessageToRecipient(sender, resetCompleteMessage, session);
-                    await message.destroy({ where: { receiver_number: receiverNumber, status: 'received' } })
+                    await message.destroy({ where: { receiver_number: receiverNumber, status: ['attendance', 'non-attendance'] } })
                     console.log(`Reset complete message sent to ${sender}`);
                 } catch (error) {
                     console.error('Error sending reset complete message:', error.message);

@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Send Message</title>
-    <link rel="stylesheet" href="message.css">
+    <link rel="stylesheet" href="./message.css">
 </head>
 <body>
     <div class="container">
         <h1>Send Message</h1>
-        <button type="button" onclick="history.back()">Back</button>
+        <a href="./index.html"><button type="button">Back</button></a>
         <form id="sendMessageForm">
             <div class="step active" id="step1">
                 <label for="countryCode">Country Code:</label>
@@ -83,9 +83,46 @@
 
         document.getElementById('sendMessageForm').addEventListener('submit', async function(event) {
             event.preventDefault();
+
+            const invitationData = {
+                chat_id: document.getElementById('countryCode').value + document.getElementById('chatId').value + '@c.us',
+                nama_laki_laki: document.getElementById('namaLakiLaki').value,
+                nama_perempuan: document.getElementById('namaPerempuan').value,
+                hari_akad: document.getElementById('hariAkad').value,
+                tanggal_akad: document.getElementById('tanggalAkad').value,
+                waktu_mulai_akad: document.getElementById('waktuMulaiAkad').value,
+                waktu_selesai_akad: document.getElementById('waktuSelesaiAkad').value,
+                lokasi_akad: document.getElementById('lokasiAkad').value,
+                hari_resepsi: document.getElementById('hariResepsi').value,
+                tanggal_resepsi: document.getElementById('tanggalResepsi').value,
+                waktu_mulai_resepsi: document.getElementById('waktuMulaiResepsi').value,
+                waktu_selesai_resepsi: document.getElementById('waktuSelesaiResepsi').value,
+                lokasi_resepsi: document.getElementById('lokasiResepsi').value
+            };
+
+            try {
+                const response = await fetch('/api/addInvitation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(invitationData)
+                });
+
+                if (response.ok) {
+                    document.getElementById('response').textContent = "Invitation Successfully Saved";
+                } else {
+                    document.getElementById('response').textContent = "Failed to Save Invitation";
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById('response').textContent = "Terjadi kesalahan saat menyimpan undangan";
+            }
+
             const countryCode = document.getElementById('countryCode').value;
             const chatIdInput = document.getElementById('chatId');
             const chatId = countryCode + chatIdInput.value + '@c.us';
+             const phoneNumbers = chatId.split(/[\s,]+/);
             const namaLakiLaki = document.getElementById('namaLakiLaki').value;
             const namaPerempuan = document.getElementById('namaPerempuan').value;
             const hariAkad = document.getElementById('hariAkad').value;
@@ -137,7 +174,7 @@ Anda bisa konfirmasi kehadiran melalui Undangan atau klik tombol RSVP dibawah in
                 console.log('Response data:', responseData);
 
                 if (response.ok) {
-                    responseElement.textContent = "Pesan Berhasil Terkirim";
+                    responseElement.textContent = "Text Successfully Sent";
                     responseElement.className = 'success';
                 } else {
                     const errorData = await response.text();

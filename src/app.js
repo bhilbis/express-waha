@@ -42,9 +42,7 @@ app.get('/api/sessions', wahaController.getSessions);
 app.get('/api/screenshot', wahaController.screenshotSession);
 //send sessions
 app.post('/api/sendText', wahaController.sendMessage);
-// app.get('/api/messages', wahaController.fetchLatestMessage);
-//End point get messages
-// app.get('/api/messages', wahaController.getMessage);
+app.post('/api/addInvitation', wahaController.addInvitation)
 
 app.use((err, req, res, next) => {
     if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {

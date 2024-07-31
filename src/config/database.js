@@ -11,12 +11,12 @@ const { Sequelize } = require('sequelize');
 const sequelize = new Sequelize('wa-api', 'postgres', '123456', {
   host: '127.0.0.1',
   dialect: 'postgres',
-  logging: console.log,
-  omitNull: true
+  logging: false,
+  // omitNull: true
 });
 
 sequelize.authenticate()
-  .then(() => {
+  .then(() => { 
     console.log('Connection has been established successfully.');
   })
   .catch(err => {

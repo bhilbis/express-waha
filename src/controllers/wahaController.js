@@ -1,5 +1,6 @@
 const axios = require('axios');
 // const message = require('../models/Invitation');
+const { addWeddingInvitation } = require('../services/weddingInvitationService')
 
 // const WAHA_API_BASE_URL = 'http://149.28.155.78:3000/api';
 const WAHA_API_BASE_URL = 'http://localhost:3001/api';
@@ -66,16 +67,6 @@ const sendMessage = async (req, res) => {
         console.log(`Sending message to ${chatId}: ${text}`);
         const response = await axios.post(`${WAHA_API_BASE_URL}/sendText`, { chatId, text, session });
 
-        // await message.create({
-        //     message:text,
-        //     date_sent: new Date(),
-        //     date_receive: new Date(),
-        //     status: 'sent',
-        //     receiver_number: chatId,
-        //     sender_number: 'your_number'
-        // });
-        // res.status(response.status).send(response.data);
-
         notifyClients({ chatId, text, session });
     } catch (error) {
         console.error('Error sending message:', error.message); 
@@ -83,6 +74,16 @@ const sendMessage = async (req, res) => {
     }
 };
 
+const addInvitation = async (req, res) => {
+    try {
+        console.log('Received invitation data:', req.body);
+        await addWeddingInvitation(req.body);
+        res.status(200).send('Undangan berhasil disimpan');
+    } catch (error) {
+        console.error('Error adding wedding invitation:', error);
+        res.status(500).send('Gagal menyimpan undangan');
+    }
+};
 
 
 module.exports = {
@@ -92,4 +93,5 @@ module.exports = {
     getSessions,
     screenshotSession,
     sendMessage,
+    addInvitation,
 };
