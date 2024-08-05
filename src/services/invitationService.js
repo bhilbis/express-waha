@@ -8,7 +8,7 @@ const addMessage = async ({ message, date_sent, date_read, date_receive, status,
         replacements: [message, date_sent, date_read, date_receive, status, receiver_number, sender_number],
       }
     );
-    console.log('New invitation added:', newMessage);
+    console.log('New invitation added');
   } catch (error) {
     console.error('Error adding invitation:', error);
   }
@@ -16,13 +16,13 @@ const addMessage = async ({ message, date_sent, date_read, date_receive, status,
 
 const updateMessageStatus = async (id_wedding, newStatus) => {
   try {
-      await sequelize.query(
-        'UPDATE message SET status = ? WHERE id = ?',
-        {
-          replacements: [newStatus, id],
-        }
-      )
-      console.log(`Invitation status updated to ${newStatus}`);
+    await sequelize.query(
+      'UPDATE message SET status = ? WHERE id = ?',
+      {
+        replacements: [newStatus, id_wedding],
+      }
+    );
+    console.log(`Invitation status updated to ${newStatus}`);
   } catch (error) {
     console.error('Error updating invitation status:', error);
   }
@@ -32,7 +32,7 @@ const getMessage = async () => {
   try {
     const [results] = await sequelize.query('SELECT * FROM message', {
       type: sequelize.QueryTypes.SELECT,
-    })
+    });
     console.log('All invitations:', results);
   } catch (error) {
     console.error('Error fetching invitations:', error);
@@ -42,14 +42,16 @@ const getMessage = async () => {
 
 const deleteConfirmation = async (receiver_number) => {
   try {
-    const query = `DELETE FROM message WHERE receiver_number = $6`
-    const values = [receiver_number];
-    await sequelize.query(query, values);
+    const query = `DELETE FROM message WHERE receiver_number = ? AND status IN ('attendance', 'non-attendance')`;
+    await sequelize.query(query, {
+      replacements: [receiver_number],
+    });
+    console.log('Confirmation Deleted');
   } catch (error) {
     console.error('Error deleting confirmation from database:', error.message);
     throw error;
-  };
-}
+  }
+};
 
 module.exports = {
   addMessage,

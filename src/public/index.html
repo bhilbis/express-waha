@@ -115,7 +115,7 @@
                     "noweb": { "store": { "enabled": true, "fullSync": false } },
                     "webhooks": [
                         {
-                            "url": "https://rough-alarm-94.webhook.cool",
+                            "url": "",
                             "events": ["message", "session.status"],
                             "hmac": null,
                             "retries": null,
@@ -201,26 +201,32 @@
         // document.addEventListener('DOMContentLoaded', () => {
             const ws = new WebSocket('ws://localhost:3000/websocket');
 
-            ws.onopen = () => {
-                console.log('WebSocket connection opened');
-            };
+        ws.onopen = () => {
+            console.log('WebSocket connection opened');
+        };
 
-            ws.onmessage = (event) => {
-                const message = JSON.parse(event.data);
-                const messageContainer = document.getElementById('messageContainer')
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message');
-                messageDiv.textContent = `${data.timestamp} - ${data.sender}: ${data.message}`;
-                messageContainer.appendChild(messageDiv);
-            };
+        ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            console.log('Received message:', message);
 
-            ws.onerror = (error) => {
-                console.error('WebSocket error:', error);
-            }
+            const timestamp = message.timestamp || 'Unknown timestamp';
+            const sender = message.sender || 'Unknown sender';
+            const messageContent = message.message || 'No message content';
 
-            ws.onclose = () => {
-                console.log('WebSocket connection closed');
-            }
+            const messageContainer = document.getElementById('messageContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.textContent = `${timestamp} - ${sender}: ${messageContent}`;
+            messageContainer.appendChild(messageDiv);
+        };
+
+        ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        }
+
+        ws.onclose = () => {
+            console.log('WebSocket connection closed');
+        }
         // })
     </script>
 </body>

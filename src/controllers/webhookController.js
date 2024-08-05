@@ -282,7 +282,8 @@ const sendMessageToRecipient = async (recipient, message, session) => {
     }
 };
 
-const getWebhookMessages = (req, res) => {
+const getWebhookMessages = (
+    res) => {
     res.status(200).json(messages);
 };
 

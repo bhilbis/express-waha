@@ -34,14 +34,14 @@ app.post('/webhook', webhookController.handleWebhook)
 app.get('/api/webhook-messages', webhookController.getWebhookMessages)
 
 //sessions
-app.post('/api/sessions/start', wahaController.startSession);
-app.post('/api/sessions/stop', wahaController.stopSession);
-app.post('/api/sessions/logout', wahaController.logoutSession);
+// app.post('/api/sessions/start', wahaController.startSession);
+// app.post('/api/sessions/stop', wahaController.stopSession);
+// app.post('/api/sessions/logout', wahaController.logoutSession);
 app.get('/api/sessions', wahaController.getSessions);
 //login screenshots
-app.get('/api/screenshot', wahaController.screenshotSession);
+// app.get('/api/screenshot', wahaController.screenshotSession);
 //send sessions
-app.post('/api/sendText', wahaController.sendMessage);
+// app.post('/api/sendText', wahaController.sendMessage);
 app.post('/api/addInvitation', wahaController.addInvitation)
 
 app.use((err, req, res, next) => {
